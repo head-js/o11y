@@ -1,13 +1,15 @@
 import { version } from '../package.json';
 
 
-function Plugin(options) {
-  this.options = options;
+function Plugin(analytics, settings, integrations) {
+  this.analytics = analytics;
+  this.settings = settings;
+  this.integrations = integrations;
   return this;
 }
 
 Plugin.prototype.load = function () {
-  console.log(this.options);
+  console.log(this.analytics, this.settings, this.integrations);
   return Promise.resolve();
 };
 
@@ -15,8 +17,8 @@ Plugin.prototype.isLoaded = () => true;
 
 Plugin.prototype.send = (ctx) => { console.log(ctx); };
 
-function factory(options) {
-  const plugin = new Plugin(options);
+function factory(analytics, settings, integrations) {
+  const plugin = new Plugin(analytics, settings, integrations);
 
   return {
     name: 'Console',
