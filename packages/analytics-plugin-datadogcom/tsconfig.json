@@ -1,0 +1,19 @@
+{
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", ".dist"],
+  "compilerOptions": {
+    "target": "es5",
+    "module": "ESNext",
+    "lib": ["es5", "es6", "dom"],
+    "outDir": ".dist",
+    "importHelpers": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "moduleResolution": "node",
+    "baseUrl": "./src",
+    "rootDir": "src",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
