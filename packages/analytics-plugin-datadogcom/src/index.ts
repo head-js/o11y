@@ -9,8 +9,58 @@ export default function datadog(
   const defaultOptions = {
   };
 
+  const uniOptions = {
+    service: analytics.settings.app.service,
+    version: analytics.settings.app.version,
+    env: analytics.settings.app.profile,
+  };
+
+  const sdkOptions = {
+    applicationId: settings.id,
+    clientToken: settings.token,
+    site: settings.endpoint,
+  };
+
+  const rumOptions = { ...analytics.settings.rum };
+
+  if (rumOptions.beforeSend) {
+    // @ts-ignore
+    sdkOptions.beforeSend = rumOptions.beforeSend;
+  }
+
+  function isDeny(event: any): boolean {
+    if (event.type === 'resource') {
+      const origins = rumOptions.denyResourceOrigins;
+      for (let i = 0; i < origins.length; i += 1) {
+        if (event.resource.url.indexOf(origins[i]) > 0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  if (rumOptions.denyResourceOrigins && rumOptions.denyResourceOrigins.length > 0) {
+    // @ts-ignore
+    if (sdkOptions.beforeSend) {
+      // @ts-ignore
+      const that = sdkOptions.beforeSend;
+       // @ts-ignore
+      sdkOptions.beforeSend = function (event, context) {
+        if (isDeny(event)) { return false; }
+        if (that(event, context) === false) { return false; }
+      };
+    } else {
+    // @ts-ignore
+    sdkOptions.beforeSend = function (event, context) {
+      if (isDeny(event)) { return false; }
+    };
+    }
+  }
+
   const options = {
     ...defaultOptions,
+    ...uniOptions,
+    ...sdkOptions,
     ...settings,
   };
 

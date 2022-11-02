@@ -13,6 +13,10 @@ import { normalize } from './normalize'
 // import { scheduleFlush } from './schedule-flush'
 
 export type SegmentioSettings = {
+  id?: string,
+  token?: string,
+  endpoint?: string,
+
   apiKey: string
   apiHost?: string
   protocol?: 'http' | 'https'
@@ -108,7 +112,16 @@ export default function segmentio(
     type: 'after',
     version: '0.1.0',
     isLoaded: (): boolean => true,
-    load: (): Promise<void> => Promise.resolve(),
+    load: (): Promise<void> => {
+      const uniOptions = { ...analytics.settings.app };
+      const sdkOptions = {
+        id: settings?.id,
+        token: settings?.token,
+        endpoint: settings?.endpoint,
+      };
+      console.log(uniOptions, sdkOptions);
+      return Promise.resolve();
+    },
     track: send,
     // identify: send,
     page: send,

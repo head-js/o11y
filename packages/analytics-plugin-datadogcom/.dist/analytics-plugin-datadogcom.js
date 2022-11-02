@@ -11841,7 +11841,57 @@ var AnalyticsPluginDatadogcom = (function () {
 
     function datadog(analytics, settings, integrations) {
         var defaultOptions = {};
-        var options = __assign(__assign({}, defaultOptions), settings);
+        var uniOptions = {
+            service: analytics.settings.app.service,
+            version: analytics.settings.app.version,
+            env: analytics.settings.app.profile,
+        };
+        var sdkOptions = {
+            applicationId: settings.id,
+            clientToken: settings.token,
+            site: settings.endpoint,
+        };
+        var rumOptions = __assign({}, analytics.settings.rum);
+        if (rumOptions.beforeSend) {
+            // @ts-ignore
+            sdkOptions.beforeSend = rumOptions.beforeSend;
+        }
+        function isDeny(event) {
+            if (event.type === 'resource') {
+                var origins = rumOptions.denyResourceOrigins;
+                for (var i = 0; i < origins.length; i += 1) {
+                    if (event.resource.url.indexOf(origins[i]) > 0) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        if (rumOptions.denyResourceOrigins && rumOptions.denyResourceOrigins.length > 0) {
+            // @ts-ignore
+            if (sdkOptions.beforeSend) {
+                // @ts-ignore
+                var that_1 = sdkOptions.beforeSend;
+                // @ts-ignore
+                sdkOptions.beforeSend = function (event, context) {
+                    if (isDeny(event)) {
+                        return false;
+                    }
+                    if (that_1(event, context) === false) {
+                        return false;
+                    }
+                };
+            }
+            else {
+                // @ts-ignore
+                sdkOptions.beforeSend = function (event, context) {
+                    if (isDeny(event)) {
+                        return false;
+                    }
+                };
+            }
+        }
+        var options = __assign(__assign(__assign(__assign({}, defaultOptions), uniOptions), sdkOptions), settings);
         datadogRum.init(options);
         function addAction(ctx) {
             return __awaiter(this, void 0, void 0, function () {

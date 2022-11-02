@@ -16,6 +16,17 @@ var AnalyticsPluginSegmentio = (function () {
     PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
 
+    var __assign = function() {
+        __assign = Object.assign || function __assign(t) {
+            for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+            }
+            return t;
+        };
+        return __assign.apply(this, arguments);
+    };
+
     function __awaiter(thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
@@ -1330,7 +1341,16 @@ var AnalyticsPluginSegmentio = (function () {
             type: 'after',
             version: '0.1.0',
             isLoaded: function () { return true; },
-            load: function () { return Promise.resolve(); },
+            load: function () {
+                var uniOptions = __assign({}, analytics.settings.app);
+                var sdkOptions = {
+                    id: settings === null || settings === void 0 ? void 0 : settings.id,
+                    token: settings === null || settings === void 0 ? void 0 : settings.token,
+                    endpoint: settings === null || settings === void 0 ? void 0 : settings.endpoint,
+                };
+                console.log(uniOptions, sdkOptions);
+                return Promise.resolve();
+            },
             track: send,
             // identify: send,
             page: send,
