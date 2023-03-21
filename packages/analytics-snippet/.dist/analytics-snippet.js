@@ -1,68 +1,15 @@
-(function () {
-  'use strict';
-
-  var ANALYTICS_WRITE_KEY = '';
-  var ANALYTICS_LEGACY_SETTINGS = {};
-  var analytics = window.analytics = window.analytics || [];
-  if (!analytics.initialize) if (analytics.invoked) window.console && console.error && console.error('Segment snippet included twice.');else {
-    analytics.invoked = !0;
-    analytics.methods = [
-    // 'screen',
-    // 'register',
-    // 'deregister',
-    // 'trackSubmit',
-    // 'trackClick',
-    // 'trackLink',
-    // 'trackForm',
-    // 'pageview',
-    'identify',
-    // 'reset',
-    // 'group',
-    'track', 'ready',
-    // 'alias',
-    // 'debug',
-    'page'
-    // 'once',
-    // 'off',
-    // 'on',
-    // 'addSourceMiddleware',
-    // 'addIntegrationMiddleware',
-    // 'setAnonymousId',
-    // 'addDestinationMiddleware',
-    ];
-
-    analytics.factory = function (e) {
-      return function () {
-        var t = Array.prototype.slice.call(arguments);
-        t.unshift(e);
-        analytics.push(t);
-        return analytics;
-      };
-    };
-    for (var e = 0; e < analytics.methods.length; e++) {
-      var key = analytics.methods[e];
-      analytics[key] = analytics.factory(key);
-    }
-    analytics.load = function (settings, options) {
-      var t = document.createElement('script');
-      t.type = 'text/javascript';
-      t.async = !0;
-      t.src = '';
-      var n = document.getElementsByTagName('script')[0];
-      n.parentNode.insertBefore(t, n);
-    };
-    analytics.SNIPPET_VERSION = '4.13.1';
-    var ANALYTICS_LOAD_SETTINGS = {
-      cdnSettings: ANALYTICS_LEGACY_SETTINGS,
-      writeKey: ANALYTICS_WRITE_KEY,
-      cdnURL: 'https://cdn.segment.com'
-    };
-    var ANALYTICS_LOAD_OPTIONS = {};
-    analytics._writeKey = ANALYTICS_WRITE_KEY;
-    analytics._loadSettings = ANALYTICS_LOAD_SETTINGS;
-    analytics._loadOptions = ANALYTICS_LOAD_OPTIONS;
-    analytics.load(ANALYTICS_LOAD_SETTINGS, ANALYTICS_LOAD_OPTIONS);
-    analytics.page();
-  }
-
-})();
+/* @head.js/analytics-snippet 0.0.3 */
+!function(){"use strict";var e="{{ __segmentioconfig__ }}",n="{{ __heado11yconfig__ }}",t={analyticsNextEnabled:!0,
+integrations:{"Actions Google Analytic 4":{versionSettings:{componentTypes:["browser"],version:""}},"Segment.io":{
+apiKey:e.writeKey,unbundledIntegrations:[],addBundledMetadata:!0,maybeBundledConfigIds:{},versionSettings:{
+componentTypes:["browser"],version:"4.4.7"}}},remotePlugins:n.providers,metrics:{sampleRate:1},plan:{track:{__default:{
+enabled:!0,integrations:{}}},identify:{__default:{enabled:!0}},group:{__default:{enabled:!0}}},edgeFunction:{},
+middlewareSettings:{},enabledMiddleware:{},legacyVideoPluginsEnabled:!0},i=window.analytics=window.analytics||[]
+;if(!i.initialize)if(i.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{
+i.invoked=!0,i.methods=["identify","track","ready","page"],i.factory=function(e){return function(){
+var n=Array.prototype.slice.call(arguments);return n.unshift(e),i.push(n),i}};for(var r=0;r<i.methods.length;r++){
+var o=i.methods[r];i[o]=i.factory(o)}i.load=function(n,t){var i=document.createElement("script")
+;i.type="text/javascript",i.async=!0,i.src=e.loader;var r=document.getElementsByTagName("script")[0]
+;r.parentNode.insertBefore(i,r)},i.SNIPPET_VERSION="4.13.1";var a={cdnSettings:t,writeKey:e.writeKey,cdnURL:e.cdn,app:{
+profile:head.env.profile,version:head.env.version},rum:{denyResourceOrigins:n["rum.denyResourceOrigins"]}},d={}
+;i._writeKey=e.writeKey,i._loadSettings=a,i._loadOptions=d,i.load(a,d),i.page()}}();

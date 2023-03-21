@@ -5,6 +5,7 @@
     "browser": true
   },
   "globals": {
+    "head": true,
   },
   "rules": {
     "curly": "off",
