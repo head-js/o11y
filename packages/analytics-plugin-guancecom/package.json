@@ -1,6 +1,6 @@
 {
   "name": "@head-js-o11y/analytics-plugin-guancecom",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "browser": ".dist/analytics-plugin-guancecom.js",
@@ -10,7 +10,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@cloudcare/browser-rum": "2.2.3"
+    "@cloudcare/browser-rum": "2.2.15"
   },
   "devDependencies": {
     "@babel/core": "7.12.17",
@@ -27,7 +27,7 @@
     "rollup": "2.60.2",
     "terser": "5.5.1",
     "tslib": "2.3.1",
-    "typescript": "4.0.8",
+    "typescript": "4.4.4",
     "vanilla.js": "0.2.7"
   }
 }

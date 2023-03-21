@@ -610,7 +610,7 @@ var AnalyticsPluginGuancecom = (function () {
       if (typeof WeakSet !== 'undefined') {
         var set = new WeakSet();
         return {
-          hasAlreadyBeenSeen(value) {
+          hasAlreadyBeenSeen: function hasAlreadyBeenSeen(value) {
             var has = set.has(value);
 
             if (!has) {
@@ -619,13 +619,12 @@ var AnalyticsPluginGuancecom = (function () {
 
             return has;
           }
-
         };
       }
 
       var array = [];
       return {
-        hasAlreadyBeenSeen(value) {
+        hasAlreadyBeenSeen: function hasAlreadyBeenSeen(value) {
           var has = array.indexOf(value) >= 0;
 
           if (!has) {
@@ -634,7 +633,6 @@ var AnalyticsPluginGuancecom = (function () {
 
           return has;
         }
-
       };
     }
     /**
@@ -1082,7 +1080,7 @@ var AnalyticsPluginGuancecom = (function () {
       }
     }
     function escapeFieldValueStr(str) {
-      return '"' + str.replace(/[\\]*"/g, '"').replace(/"/g, '\\"') + '"';
+      return '"' + str.replace(/\\/g, '\\\\').replace(/[\\]*"/g, '"').replace(/"/g, '\\"') + '"';
     }
     function escapeRowField(value) {
       if (typeof value === 'object' && value) {
@@ -1101,21 +1099,23 @@ var AnalyticsPluginGuancecom = (function () {
       }
     }
 
+    var BUFFER_LIMIT = 500;
+
     var _BoundedBuffer = function _BoundedBuffer() {
       this.buffer = [];
     };
 
     _BoundedBuffer.prototype = {
-      add: function add(item) {
-        var length = this.buffer.push(item);
+      add: function add(callback) {
+        var length = this.buffer.push(callback);
 
-        if (length > this.limit) {
+        if (length > BUFFER_LIMIT) {
           this.buffer.splice(0, 1);
         }
       },
-      drain: function drain(fn) {
-        each(this.buffer, function (item) {
-          fn(item);
+      drain: function drain() {
+        each(this.buffer, function (callback) {
+          callback();
         });
         this.buffer.length = 0;
       }
@@ -1162,7 +1162,9 @@ var AnalyticsPluginGuancecom = (function () {
         startTime = END_OF_TIMES;
       }
 
-      for (var entry of this.entries) {
+      for (var i = 0; i < this.entries.length; i++) {
+        var entry = this.entries[i];
+
         if (entry.startTime <= startTime) {
           if (startTime <= entry.endTime) {
             return entry.context;
@@ -2557,8 +2559,11 @@ var AnalyticsPluginGuancecom = (function () {
 
     function get(object, path) {
       var current = object;
+      var fields = path.split('.');
 
-      for (var field of path.split('.')) {
+      for (var i = 0; i < fields.length; i++) {
+        var field = fields[i];
+
         if (!isValidObjectContaining(current, field)) {
           return;
         }
@@ -2948,7 +2953,8 @@ var AnalyticsPluginGuancecom = (function () {
          * Logs intake limit
          */
         batchMessagesLimit: 50,
-        messageBytesLimit: 256 * ONE_KIBI_BYTE
+        messageBytesLimit: 256 * ONE_KIBI_BYTE,
+        resourceUrlLimit: 5 * ONE_KIBI_BYTE
       }, computeTransportConfiguration(initConfiguration));
     }
     function buildCookieOptions(initConfiguration) {
@@ -3173,6 +3179,8 @@ var AnalyticsPluginGuancecom = (function () {
       view_url: 'view.url',
       view_host: 'view.host',
       view_path: 'view.path',
+      view_name: 'view.path',
+      // 冗余一个字段
       view_path_group: 'view.path_group',
       view_url_query: 'view.url_query'
     }; // 需要用双引号将字符串类型的field value括起来， 这里有数组标示[string, path]
@@ -3232,7 +3240,14 @@ var AnalyticsPluginGuancecom = (function () {
           resource_ssl: 'resource.ssl',
           resource_ttfb: 'resource.ttfb',
           resource_trans: 'resource.trans',
-          resource_first_byte: 'resource.firstbyte'
+          resource_redirect: 'resource.redirect',
+          resource_first_byte: 'resource.firstbyte',
+          resource_dns_time: 'resource.dns_time',
+          resource_download_time: 'resource.download_time',
+          resource_first_byte_time: 'resource.first_byte_time',
+          resource_connect_time: 'resource.connect_time',
+          resource_ssl_time: 'resource.ssl_time',
+          resource_redirect_time: 'resource.redirect_time'
         }
       },
       error: {
@@ -3270,10 +3285,10 @@ var AnalyticsPluginGuancecom = (function () {
       action: {
         type: RumEventType.ACTION,
         tags: {
-          action_name: 'action.target.name',
           action_type: 'action.type'
         },
         fields: {
+          action_name: 'action.target.name',
           duration: 'action.loading_time',
           action_error_count: 'action.error.count',
           action_resource_count: 'action.resource.count',
@@ -3868,12 +3883,10 @@ var AnalyticsPluginGuancecom = (function () {
           queue.push(payload);
           this.bytesCount += payload.bytesCount;
         },
-
-        first() {
+        first: function first() {
           return queue[0];
         },
-
-        dequeue() {
+        dequeue: function dequeue() {
           var payload = queue.shift();
 
           if (payload) {
@@ -3882,15 +3895,12 @@ var AnalyticsPluginGuancecom = (function () {
 
           return payload;
         },
-
-        size() {
+        size: function size() {
           return queue.length;
         },
-
-        isFull() {
+        isFull: function isFull() {
           return this.bytesCount >= MAX_QUEUE_BYTES_COUNT;
         }
-
       };
     }
 
@@ -4018,7 +4028,7 @@ var AnalyticsPluginGuancecom = (function () {
 
     // eslint-disable-next-line no-control-regex
 
-    var HAS_MULTI_BYTES_CHARACTERS = /[^\u0000-\u007F]/;
+    var HAS_MULTI_BYTES_CHARACTERS$1 = /[^\u0000-\u007F]/;
     var CUSTOM_KEYS = 'custom_keys';
     var processedMessageByDataMap = function processedMessageByDataMap(message) {
       if (!message || !message.type) return {
@@ -4194,7 +4204,7 @@ var AnalyticsPluginGuancecom = (function () {
 
     batch.prototype.computeBytesCount = function (candidate) {
       // Accurate bytes count computations can degrade performances when there is a lot of events to process
-      if (!HAS_MULTI_BYTES_CHARACTERS.test(candidate)) {
+      if (!HAS_MULTI_BYTES_CHARACTERS$1.test(candidate)) {
         return candidate.length;
       }
 
@@ -4463,6 +4473,21 @@ var AnalyticsPluginGuancecom = (function () {
     function isRequestKind(timing) {
       return timing.initiatorType === 'xmlhttprequest' || timing.initiatorType === 'fetch';
     }
+    var HAS_MULTI_BYTES_CHARACTERS = /[^\u0000-\u007F]/;
+    function getStrSize(candidate) {
+      if (!HAS_MULTI_BYTES_CHARACTERS.test(candidate)) {
+        return candidate.length;
+      }
+
+      if (window.TextEncoder !== undefined) {
+        return new TextEncoder().encode(candidate).length;
+      }
+
+      return new Blob([candidate]).size;
+    }
+    function isResourceUrlLimit(name, limitSize) {
+      return getStrSize(name) > limitSize;
+    }
     function computePerformanceResourceDuration(entry) {
       // Safari duration is always 0 on timings blocked by cross origin policies.
       if (entry.duration === 0 && entry.startTime < entry.responseEnd) {
@@ -4553,26 +4578,32 @@ var AnalyticsPluginGuancecom = (function () {
           responseStart = validEntry.responseStart,
           responseEnd = validEntry.responseEnd;
       var details = {
-        firstbyte: formatTiming(startTime, domainLookupStart, responseStart),
-        trans: formatTiming(startTime, responseStart, responseEnd),
-        ttfb: formatTiming(startTime, requestStart, responseStart)
+        firstbyte: msToNs(responseStart - domainLookupStart),
+        trans: msToNs(responseEnd - responseStart),
+        ttfb: msToNs(responseStart - requestStart),
+        downloadTime: formatTiming(startTime, responseStart, responseEnd),
+        firstByteTime: formatTiming(startTime, requestStart, responseStart)
       }; // Make sure a connection occurred
 
       if (connectEnd !== fetchStart) {
-        details.tcp = formatTiming(startTime, connectStart, connectEnd); // Make sure a secure connection occurred
+        details.tcp = msToNs(connectEnd - connectStart);
+        details.connectTime = formatTiming(startTime, connectStart, connectEnd); // Make sure a secure connection occurred
 
         if (areInOrder(connectStart, secureConnectionStart, connectEnd)) {
-          details.ssl = formatTiming(startTime, secureConnectionStart, connectEnd);
+          details.ssl = msToNs(connectEnd - secureConnectionStart);
+          details.sslTime = formatTiming(startTime, secureConnectionStart, connectEnd);
         }
       } // Make sure a domain lookup occurred
 
 
       if (domainLookupEnd !== fetchStart) {
-        details.dns = formatTiming(startTime, domainLookupStart, domainLookupEnd);
+        details.dns = msToNs(domainLookupEnd - domainLookupStart);
+        details.dnsTime = formatTiming(startTime, domainLookupStart, domainLookupEnd);
       }
 
       if (hasRedirection(entry)) {
-        details.redirect = formatTiming(startTime, redirectStart, redirectEnd);
+        details.redirect = msToNs(redirectEnd - redirectStart);
+        details.redirectTime = formatTiming(startTime, redirectStart, redirectEnd);
       }
 
       return details;
@@ -4636,10 +4667,10 @@ var AnalyticsPluginGuancecom = (function () {
     }
 
     function formatTiming(origin, start, end) {
-      return msToNs(end - start); // return {
-      //   duration: msToNs(end - start),
-      //   start: msToNs(start - origin)
-      // }
+      return {
+        duration: msToNs(end - start),
+        start: msToNs(start - origin)
+      };
     }
 
     function computeSize(entry) {
@@ -5015,7 +5046,9 @@ var AnalyticsPluginGuancecom = (function () {
 
     function startLongTaskCollection(lifeCycle, sessionManager) {
       lifeCycle.subscribe(LifeCycleEventType.PERFORMANCE_ENTRIES_COLLECTED, function (entries) {
-        for (var entry of entries) {
+        for (var i = 0; i < entries.length; i++) {
+          var entry = entries[i];
+
           if (entry.entryType !== 'longtask') {
             return;
           }
@@ -5425,7 +5458,8 @@ var AnalyticsPluginGuancecom = (function () {
       var recursionCounter = 0;
 
       while (recursionCounter <= MAX_PARENTS_TO_CONSIDER && element && element.nodeName !== 'BODY' && element.nodeName !== 'HTML' && element.nodeName !== 'HEAD') {
-        for (var strategy of strategies) {
+        for (var i = 0; i < strategies.length; i++) {
+          var strategy = strategies[i];
           var name = strategy(element, userProgrammaticAttribute);
 
           if (typeof name === 'string') {
@@ -6417,7 +6451,7 @@ var AnalyticsPluginGuancecom = (function () {
           trackFirstHiddenSingleton = {
             timeStamp: Infinity
           };
-          var listeners = addEventListeners(emitter, [DOM_EVENT.PAGE_HIDE, DOM_EVENT.VISIBILITY_CHANGE], function (evt) {
+          var listeners = addEventListeners(emitter, [DOM_EVENT.PAGE_HIDE, DOM_EVENT.VISIBILITY_CHANGE], function (event) {
             if (event.type === 'pagehide' || document.visibilityState === 'hidden') {
               trackFirstHiddenSingleton.timeStamp = event.timeStamp;
               stopListeners();
@@ -6482,7 +6516,9 @@ var AnalyticsPluginGuancecom = (function () {
     }
     function trackNavigationTimings(lifeCycle, callback) {
       var subscribe = lifeCycle.subscribe(LifeCycleEventType.PERFORMANCE_ENTRIES_COLLECTED, function (entries) {
-        for (var entry of entries) {
+        for (var i = 0; i < entries.length; i++) {
+          var entry = entries[i];
+
           if (entry.entryType === 'navigation') {
             callback({
               fetchStart: entry.fetchStart,
@@ -6698,7 +6734,9 @@ var AnalyticsPluginGuancecom = (function () {
       var window = slidingSessionWindow();
 
       var _subscribe = lifeCycle.subscribe(LifeCycleEventType.PERFORMANCE_ENTRIES_COLLECTED, function (entries) {
-        for (var entry of entries) {
+        for (var i = 0; i < entries.length; i++) {
+          var entry = entries[i];
+
           if (entry.entryType === 'layout-shift' && !entry.hadRecentInput) {
             window.update(entry);
 
@@ -7693,8 +7731,10 @@ var AnalyticsPluginGuancecom = (function () {
         lifeCycle.notify(LifeCycleEventType.RAW_RUM_EVENT_COLLECTED, processRequest(request));
       });
       lifeCycle.subscribe(LifeCycleEventType.PERFORMANCE_ENTRIES_COLLECTED, function (entries) {
-        for (var entry of entries) {
-          if (entry.entryType === 'resource' && !isRequestKind(entry)) {
+        for (var i = 0; i < entries.length; i++) {
+          var entry = entries[i];
+
+          if (entry.entryType === 'resource' && !isRequestKind(entry) && !isResourceUrlLimit(entry.name, configuration.resourceUrlLimit)) {
             lifeCycle.notify(LifeCycleEventType.RAW_RUM_EVENT_COLLECTED, processResourceEntry(entry));
           }
         }
@@ -7842,7 +7882,7 @@ var AnalyticsPluginGuancecom = (function () {
       var urlContexts = _startRumEventCollection.urlContexts;
       var actionContexts = _startRumEventCollection.actionContexts;
       startLongTaskCollection(lifeCycle, session);
-      startResourceCollection(lifeCycle);
+      startResourceCollection(lifeCycle, configuration);
 
       var _startViewCollection = startViewCollection(lifeCycle, configuration, location, domMutationObservable, locationChangeObservable, initialViewOptions);
 
@@ -7887,7 +7927,7 @@ var AnalyticsPluginGuancecom = (function () {
     }
 
     var buildEnv = {
-      sdkVersion: '2.2.3',
+      sdkVersion: '2.2.15',
       sdkName: 'df_web_rum_sdk'
     };
 
@@ -8278,12 +8318,14 @@ var AnalyticsPluginGuancecom = (function () {
         var guancecom = {
             name: 'Guance.com',
             type: 'destination',
-            version: '2.2.6-1',
+            version: '2.2.15-1',
             isLoaded: function () { return true; },
             load: function () { return Promise.resolve(); },
             track: addAction,
             // identify: send,
             page: function () { return Promise.resolve(); },
+            // alias: send,
+            // group: send,
         };
         return guancecom;
     }
