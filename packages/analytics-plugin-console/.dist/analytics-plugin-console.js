@@ -1,7 +1,7 @@
 var AnalyticsPluginConsole = (function () {
   'use strict';
 
-  var version = "0.0.2";
+  var version = "0.1.0";
 
   function Plugin(analytics, settings, integrations) {
     this.analytics = analytics;
@@ -10,7 +10,7 @@ var AnalyticsPluginConsole = (function () {
     return this;
   }
   Plugin.prototype.load = function () {
-    console.log(this.analytics, this.settings, this.integrations);
+    console.log(this.settings, this.settings.app, this.settings.rum);
     return Promise.resolve();
   };
   Plugin.prototype.isLoaded = function () {
@@ -19,8 +19,8 @@ var AnalyticsPluginConsole = (function () {
   Plugin.prototype.send = function (ctx) {
     console.log(ctx);
   };
-  function factory(analytics, settings, integrations) {
-    var plugin = new Plugin(analytics, settings, integrations);
+  function factory(settings) {
+    var plugin = new Plugin(null, settings, null);
     return {
       name: 'Console',
       version: version,

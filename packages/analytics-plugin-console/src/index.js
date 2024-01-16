@@ -9,7 +9,7 @@ function Plugin(analytics, settings, integrations) {
 }
 
 Plugin.prototype.load = function () {
-  console.log(this.analytics, this.settings, this.integrations);
+  console.log(this.settings, this.settings.app, this.settings.rum);
   return Promise.resolve();
 };
 
@@ -17,8 +17,8 @@ Plugin.prototype.isLoaded = () => true;
 
 Plugin.prototype.send = (ctx) => { console.log(ctx); };
 
-function factory(analytics, settings, integrations) {
-  const plugin = new Plugin(analytics, settings, integrations);
+function factory(settings) {
+  const plugin = new Plugin(null, settings, null);
 
   return {
     name: 'Console',

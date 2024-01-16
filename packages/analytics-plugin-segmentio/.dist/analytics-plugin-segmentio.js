@@ -16,17 +16,6 @@ var AnalyticsPluginSegmentio = (function () {
     PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
 
-    var __assign = function() {
-        __assign = Object.assign || function __assign(t) {
-            for (var s, i = 1, n = arguments.length; i < n; i++) {
-                s = arguments[i];
-                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-            }
-            return t;
-        };
-        return __assign.apply(this, arguments);
-    };
-
     function __awaiter(thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
@@ -1063,15 +1052,15 @@ var AnalyticsPluginSegmentio = (function () {
         if (evt.type === 'page') {
             fcd = new dist.Page(evt, options);
         }
-        if (evt.type === 'alias') {
-            fcd = new dist.Alias(evt, options);
-        }
-        if (evt.type === 'group') {
-            fcd = new dist.Group(evt, options);
-        }
-        if (evt.type === 'screen') {
-            fcd = new dist.Screen(evt, options);
-        }
+        // if (evt.type === 'alias') {
+        //   fcd = new Alias(evt, options)
+        // }
+        // if (evt.type === 'group') {
+        //   fcd = new Group(evt, options)
+        // }
+        // if (evt.type === 'screen') {
+        //   fcd = new Screen(evt, options)
+        // }
         Object.defineProperty(fcd, 'obj', {
             value: evt,
             writable: true,
@@ -1079,16 +1068,11 @@ var AnalyticsPluginSegmentio = (function () {
         return fcd;
     }
 
-    function unfetch(e,n){return n=n||{},new Promise(function(t,r){var s=new XMLHttpRequest,o=[],u=[],i={},a=function(){return {ok:2==(s.status/100|0),statusText:s.statusText,status:s.status,url:s.responseURL,text:function(){return Promise.resolve(s.responseText)},json:function(){return Promise.resolve(s.responseText).then(JSON.parse)},blob:function(){return Promise.resolve(new Blob([s.response]))},clone:a,headers:{keys:function(){return o},entries:function(){return u},get:function(e){return i[e.toLowerCase()]},has:function(e){return e.toLowerCase()in i}}}};for(var l in s.open(n.method||"get",e,!0),s.onload=function(){s.getAllResponseHeaders().replace(/^(.*?):[^\S\n]*([\s\S]*?)$/gm,function(e,n,t){o.push(n=n.toLowerCase()),u.push([n,t]),i[n]=i[n]?i[n]+","+t:t;}),t(a());},s.onerror=r,s.withCredentials="include"==n.credentials,n.headers)s.setRequestHeader(l,n.headers[l]);s.send(n.body||null);})}
-
-    var fetch = unfetch;
-    if (typeof window !== 'undefined') {
-        // @ts-ignore
-        fetch = window.fetch || unfetch;
-    }
-    function standard () {
+    // import { fetch } from '../../lib/fetch'
+    function standard (config) {
         function dispatch(url, body) {
             return fetch(url, {
+                keepalive: config === null || config === void 0 ? void 0 : config.keepalive,
                 headers: { 'Content-Type': 'text/plain' },
                 method: 'post',
                 body: JSON.stringify(body),
@@ -1099,160 +1083,33 @@ var AnalyticsPluginSegmentio = (function () {
         };
     }
 
-    /**
-     * Tries to gets the unencoded version of an encoded component of a
-     * Uniform Resource Identifier (URI). If input string is malformed,
-     * returns it back as-is.
-     *
-     * Note: All occurences of the `+` character become ` ` (spaces).
-     **/
-    function gracefulDecodeURIComponent(encodedURIComponent) {
-        try {
-            return decodeURIComponent(encodedURIComponent.replace(/\+/g, ' '));
-        }
-        catch (_a) {
-            return encodedURIComponent;
-        }
-    }
-
-    // This file is generated.
-    var version = '1.45.0';
-
-    // import { SegmentEvent } from '../../core/events'
-    // let cookieOptions: jar.CookieAttributes | undefined
-    // function getCookieOptions(): jar.CookieAttributes {
-    //   if (cookieOptions) {
-    //     return cookieOptions
-    //   }
-    //   const domain = tld(window.location.href)
-    //   cookieOptions = {
-    //     expires: 31536000000, // 1 year
-    //     secure: false,
-    //     path: '/',
-    //   }
-    //   if (domain) {
-    //     cookieOptions.domain = domain
-    //   }
-    //   return cookieOptions
-    // }
-    // // Default value will be updated to 'web' in `bundle-umd.ts` for web build.
-    // let _version: 'web' | 'npm' = 'npm'
-    // export function setVersionType(version: typeof _version) {
-    //   _version = version
-    // }
-    // export function getVersionType(): typeof _version {
-    //   return _version
-    // }
-    // type Ad = { id: string; type: string }
-    // export function ampId(): string | undefined {
-    //   const ampId = jar.get('_ga')
-    //   if (ampId && ampId.startsWith('amp')) {
-    //     return ampId
-    //   }
-    // }
-    function utm(query) {
-        if (query.startsWith('?')) {
-            query = query.substring(1);
-        }
-        query = query.replace(/\?/g, '&');
-        return query.split('&').reduce(function (acc, str) {
-            var _a = str.split('='), k = _a[0], _b = _a[1], v = _b === void 0 ? '' : _b;
-            if (k.includes('utm_') && k.length > 4) {
-                var utmParam = k.substr(4);
-                if (utmParam === 'campaign') {
-                    utmParam = 'name';
-                }
-                acc[utmParam] = gracefulDecodeURIComponent(v);
-            }
-            return acc;
-        }, {});
-    }
-    // function ads(query: string): Ad | undefined {
-    //   const queryIds: Record<string, string> = {
-    //     btid: 'dataxu',
-    //     urid: 'millennial-media',
-    //   }
-    //   if (query.startsWith('?')) {
-    //     query = query.substring(1)
-    //   }
-    //   query = query.replace(/\?/g, '&')
-    //   const parts = query.split('&')
-    //   for (const part of parts) {
-    //     const [k, v] = part.split('=')
-    //     if (queryIds[k]) {
-    //       return {
-    //         id: v,
-    //         type: queryIds[k],
-    //       }
-    //     }
-    //   }
-    // }
-    // function referrerId(
-    //   query: string,
-    //   ctx: SegmentEvent['context'],
-    //   disablePersistance: boolean
-    // ): void {
-    //   let stored = jar.get('s:context.referrer')
-    //   let ad = ads(query)
-    //   stored = stored ? JSON.parse(stored) : undefined
-    //   ad = ad ?? (stored as Ad | undefined)
-    //   if (!ad) {
-    //     return
-    //   }
-    //   if (ctx) {
-    //     ctx.referrer = { ...ctx.referrer, ...ad }
-    //   }
-    //   if (!disablePersistance) {
-    //     jar.set('s:context.referrer', JSON.stringify(ad), getCookieOptions())
-    //   }
-    // }
-    function normalize(analytics, json, settings, integrations) {
-        var _a, _b;
-        var user = analytics.user();
-        var query = window.location.search;
-        json.context = (_b = (_a = json.context) !== null && _a !== void 0 ? _a : json.options) !== null && _b !== void 0 ? _b : {};
-        var ctx = json.context;
-        var anonId = json.anonymousId;
+    function normalize(
+    // analytics: Analytics,
+    json, settings) {
+        // const user = analytics.user()
         delete json.options;
-        json.writeKey = settings === null || settings === void 0 ? void 0 : settings.apiKey;
-        ctx.userAgent = window.navigator.userAgent;
-        // @ts-ignore
-        var locale = navigator.userLanguage || navigator.language;
-        if (typeof ctx.locale === 'undefined' && typeof locale !== 'undefined') {
-            ctx.locale = locale;
-        }
-        if (!ctx.library) {
-            // const type = getVersionType()
-            // if (type === 'web') {
-            ctx.library = {
-                name: 'analytics.js',
-                version: "next-" + version,
-            };
-            // } else {
-            //   ctx.library = {
-            //     name: 'analytics.js',
-            //     version: `npm:next-${version}`,
-            //   }
-            // }
-        }
-        if (query && !ctx.campaign) {
-            ctx.campaign = utm(query);
-        }
-        // referrerId(query, ctx, analytics.options.disableClientPersistence ?? false)
-        json.userId = json.userId || user.id();
-        json.anonymousId = user.anonymousId(anonId);
+        json.writeKey = (settings === null || settings === void 0 ? void 0 : settings.apiKey) || (settings === null || settings === void 0 ? void 0 : settings.token);
+        // json.userId = json.userId || user.id()
+        // json.anonymousId = json.anonymousId || user.anonymousId()
         json.sentAt = new Date();
+        // const failed = analytics.queue.failedInitializations || []
+        // if (failed.length > 0) {
+        //   json._metadata = { failedInitializations: failed }
+        // }
+        // const bundled: string[] = []
         // const unbundled: string[] = []
-        for (var key in integrations) {
-            var integration = integrations[key];
-            //   if (key === 'Segment.io') {
-            //     bundled.push(key)
-            //   }
-            if (integration.bundlingStatus === 'bundled') ;
-            //   if (integration.bundlingStatus === 'unbundled') {
-            //     unbundled.push(key)
-            //   }
-        }
+        // for (const key in integrations) {
+        //   const integration = integrations[key]
+        //   if (key === 'Segment.io') {
+        //     bundled.push(key)
+        //   }
+        //   if (integration.bundlingStatus === 'bundled') {
+        //     bundled.push(key)
+        //   }
+        //   if (integration.bundlingStatus === 'unbundled') {
+        //     unbundled.push(key)
+        //   }
+        // }
         // // This will make sure that the disabled cloud mode destinations will be
         // // included in the unbundled list.
         // for (const settingsUnbundled of settings?.unbundledIntegrations || []) {
@@ -1275,12 +1132,10 @@ var AnalyticsPluginSegmentio = (function () {
         //     bundledIds: bundledConfigIds,
         //   }
         // }
-        // const amp = ampId()
-        // if (amp) {
-        //   ctx.amp = { id: amp }
-        // }
         return json;
     }
+
+    var SEGMENT_API_HOST = 'api.segment.io/v1';
 
     // type JSON = ReturnType<Facade['json']>
     // function onAlias(analytics: Analytics, json: JSON): JSON {
@@ -1292,70 +1147,75 @@ var AnalyticsPluginSegmentio = (function () {
     //   // delete json.to
     //   return json
     // }
-    function segmentio(analytics, settings, integrations) {
-        //   const buffer = analytics.options.disableClientPersistence
-        //     ? new PriorityQueue<Context>(analytics.queue.queue.maxAttempts, [])
-        //     : new PersistedPriorityQueue(
-        //         analytics.queue.queue.maxAttempts,
-        //         `dest-Segment.io`
-        //       )
-        //   const flushing = false
+    function segmentio(settings) {
         var _a, _b;
-        var apiHost = (_a = settings === null || settings === void 0 ? void 0 : settings.apiHost) !== null && _a !== void 0 ? _a : 'api.segment.io/v1';
-        var protocol = (_b = settings === null || settings === void 0 ? void 0 : settings.protocol) !== null && _b !== void 0 ? _b : 'https';
-        var remote = protocol + "://" + apiHost;
-        // const client =
-        //   settings?.deliveryStrategy?.strategy === 'batching'
-        //     ? batch(apiHost, settings?.deliveryStrategy?.config)
-        //     : standard()
-        var client = standard();
-        function send(ctx) {
-            return __awaiter(this, void 0, void 0, function () {
-                var path, json;
-                return __generator(this, function (_a) {
-                    path = ctx.event.type.charAt(0);
-                    json = toFacade(ctx.event).json();
-                    if (ctx.event.type === 'track') {
-                        delete json.traits;
-                    }
-                    //     if (ctx.event.type === 'alias') {
-                    //       json = onAlias(analytics, json)
-                    //     }
-                    return [2 /*return*/, client
-                            .dispatch(remote + "/" + path, normalize(analytics, json, settings, integrations))
-                            .then(function () { return ctx; })
-                        // .catch((err) => {
-                        //   if (err.type === 'error' || err.message === 'Failed to fetch') {
-                        //     buffer.push(ctx)
-                        //     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                        //     scheduleFlush(flushing, buffer, segmentio, scheduleFlush)
-                        //   }
-                        //   return ctx
-                        // })
-                    ];
+        return __awaiter(this, void 0, void 0, function () {
+            function send(ctx) {
+                return __awaiter(this, void 0, void 0, function () {
+                    var path, json;
+                    return __generator(this, function (_a) {
+                        path = ctx.event.type.charAt(0);
+                        json = toFacade(ctx.event).json();
+                        if (ctx.event.type === 'track') {
+                            delete json.traits;
+                        }
+                        //     if (ctx.event.type === 'alias') {
+                        //       json = onAlias(analytics, json)
+                        //     }
+                        return [2 /*return*/, client
+                                .dispatch("".concat(remote, "/").concat(path), 
+                            // @ts-ignore
+                            normalize(json, settings))
+                                .then(function () { return ctx; })
+                            // .catch(() => {
+                            //   buffer.pushWithBackoff(ctx)
+                            //   // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                            //   scheduleFlush(flushing, buffer, segmentio, scheduleFlush)
+                            //   return ctx
+                            // })
+                            // .finally(() => {
+                            //   inflightEvents.delete(ctx)
+                            // })
+                        ];
+                    });
                 });
-            });
-        }
-        var segmentio = {
-            name: 'Segment.io',
-            type: 'after',
-            version: '0.1.0',
-            isLoaded: function () { return true; },
-            load: function () {
-                var uniOptions = __assign({}, analytics.settings.app);
-                var sdkOptions = {
-                    id: settings === null || settings === void 0 ? void 0 : settings.id,
-                    token: settings === null || settings === void 0 ? void 0 : settings.token,
-                    endpoint: settings === null || settings === void 0 ? void 0 : settings.endpoint,
+            }
+            var apiHost, protocol, remote, client, segmentio;
+            return __generator(this, function (_c) {
+                apiHost = (_a = settings === null || settings === void 0 ? void 0 : settings.apiHost) !== null && _a !== void 0 ? _a : SEGMENT_API_HOST;
+                protocol = (_b = settings === null || settings === void 0 ? void 0 : settings.protocol) !== null && _b !== void 0 ? _b : 'https';
+                remote = "".concat(protocol, "://").concat(apiHost);
+                client = standard();
+                segmentio = {
+                    name: 'Segment.io',
+                    type: 'destination',
+                    version: '0.1.0',
+                    isLoaded: function () { return true; },
+                    load: function () {
+                        // console.log(ctx, analytics);
+                        var uniOptions = { app: settings.app, rum: settings.rum };
+                        var sdkOptions = {
+                            apiHost: settings.endpoint,
+                            apiKey: settings.token,
+                        };
+                        console.log(uniOptions, sdkOptions);
+                        return Promise.resolve();
+                    },
+                    track: send,
+                    // identify: send,
+                    page: send,
+                    // alias: send,
+                    // group: send,
+                    // screen: send,
                 };
-                console.log(uniOptions, sdkOptions);
-                return Promise.resolve();
-            },
-            track: send,
-            // identify: send,
-            page: send,
-        };
-        return segmentio;
+                // Buffer may already have items if they were previously stored in localStorage.
+                // Start flushing them immediately.
+                // if (buffer.todo) {
+                //   scheduleFlush(flushing, buffer, segmentio, scheduleFlush)
+                // }
+                return [2 /*return*/, segmentio];
+            });
+        });
     }
 
     return segmentio;

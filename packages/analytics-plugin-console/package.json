@@ -1,6 +1,6 @@
 {
   "name": "@head-js-o11y/analytics-plugin-console",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {

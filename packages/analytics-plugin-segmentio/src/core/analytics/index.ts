@@ -1,12 +1,11 @@
-import { User } from '../user'
-
-export interface Analytics {
-  user(): User
-  settings: {
-    app: {
-      service: string
-      version: string
-      profile: string
-    }
-  }
+export interface CoreAnalytics {
+  track(...args: unknown[]): unknown
+  page(...args: unknown[]): unknown
+  // identify(...args: unknown[]): unknown
+  // group(...args: unknown[]): unknown
+  // alias(...args: unknown[]): unknown
+  // screen(...args: unknown[]): unknown
+  register(...plugins: unknown[]): Promise<unknown>
+  // deregister(...plugins: unknown[]): Promise<unknown>
+  // readonly VERSION: string
 }

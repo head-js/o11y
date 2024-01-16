@@ -8,7 +8,7 @@ import typescript from '@rollup/plugin-typescript';
 
 export default [
   {
-    input: 'src/index.ts',
+    input: 'src/browser/plugins/segmentio/index.ts',
 
     external: [
       // 'core-js/modules/es.object.to-string.js',

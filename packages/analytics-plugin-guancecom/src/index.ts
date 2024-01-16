@@ -2,9 +2,9 @@ import { datafluxRum } from '@cloudcare/browser-rum';
 
 
 export default function guancecom(
-  analytics: any,
+  // analytics: any,
   settings?: any,
-  integrations?: any
+  // integrations?: any
 ): any {
   const defaultOptions = {
     traceType: 'jaeger',
@@ -12,9 +12,9 @@ export default function guancecom(
   };
 
   const uniOptions = {
-    service: analytics.settings.app.service,
-    version: analytics.settings.app.version,
-    env: analytics.settings.app.profile,
+    service: settings.app.service,
+    version: settings.app.version,
+    env: settings.app.profile,
   };
 
   const sdkOptions = {
@@ -23,7 +23,7 @@ export default function guancecom(
     datakitOrigin: settings.endpoint,
   };
 
-  const rumOptions = { ...analytics.settings.rum };
+  const rumOptions = { ...settings.rum };
 
   if (rumOptions.beforeSend) {
     // @ts-ignore

@@ -8248,22 +8248,24 @@ var AnalyticsPluginGuancecom = (function () {
     var datafluxRum = makeRumPublicApi(startRum);
     defineGlobal(getGlobalObject(), 'DATAFLUX_RUM', datafluxRum);
 
-    function guancecom(analytics, settings, integrations) {
+    function guancecom(
+    // analytics: any,
+    settings) {
         var defaultOptions = {
             traceType: 'jaeger',
             trackInteractions: true,
         };
         var uniOptions = {
-            service: analytics.settings.app.service,
-            version: analytics.settings.app.version,
-            env: analytics.settings.app.profile,
+            service: settings.app.service,
+            version: settings.app.version,
+            env: settings.app.profile,
         };
         var sdkOptions = {
             applicationId: settings.id,
             // settings.token
             datakitOrigin: settings.endpoint,
         };
-        var rumOptions = __assign({}, analytics.settings.rum);
+        var rumOptions = __assign({}, settings.rum);
         if (rumOptions.beforeSend) {
             // @ts-ignore
             sdkOptions.beforeSend = rumOptions.beforeSend;
