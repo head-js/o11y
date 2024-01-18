@@ -1,6 +1,6 @@
 {
   "name": "@head-js-o11y/analytics-plugin-guancecom",
-  "version": "0.1.0",
+  "version": "3.1.5-1",
   "description": "",
   "main": "index.js",
   "browser": ".dist/analytics-plugin-guancecom.js",
@@ -10,7 +10,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@cloudcare/browser-rum": "2.2.15"
+    "@cloudcare/browser-core": "3.1.5",
+    "@cloudcare/browser-rum": "3.1.5",
+    "@cloudcare/browser-worker": "3.1.5"
   },
   "devDependencies": {
     "@babel/core": "7.12.17",

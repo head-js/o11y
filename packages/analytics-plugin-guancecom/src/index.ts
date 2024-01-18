@@ -68,16 +68,30 @@ export default function guancecom(
 
   datafluxRum.init(options);
 
+  function transform(event) {
+    const {
+      context: { page },
+      messageId,
+      anonymousId,
+      type,
+      properties,
+      timestamp,
+      // sentAt
+      // integrations,
+    } = event;
+    return { messageId, anonymousId, type, properties, timestamp };
+  }
+
   async function addAction(ctx: any): Promise<any> {
-    const event = ctx.event;
-    datafluxRum.addAction(event.event, event);
+    const event = transform(ctx.event);
+    datafluxRum.addAction(ctx.event.event, event);
     return Promise.resolve();
   }
 
   const guancecom: any = {
     name: 'Guance.com',
     type: 'destination',
-    version: '2.2.15-1',
+    version: '3.1.5-1',
     isLoaded: (): boolean => true,
     load: (): Promise<void> => Promise.resolve(),
     track: addAction,
