@@ -10,9 +10,12 @@ export default [
     input: 'src/index.js',
 
     external: [
+      'core-js/modules/es.array.for-each.js',
       'core-js/modules/es.function.bind.js',
+      'core-js/modules/es.object.keys.js',
       'core-js/modules/es.object.to-string.js',
       'core-js/modules/es.promise.js',
+      'core-js/modules/web.dom-collections.for-each.js',
     ],
 
     plugins: [

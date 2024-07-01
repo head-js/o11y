@@ -7,8 +7,12 @@
   "globals": {
   },
   "rules": {
+    "array-bracket-spacing": [ "error", "always" ],
     "func-names": "off",
+    "max-len": "off",
     "no-console": "off",
-    "no-multiple-empty-lines": "off"
+    "no-lonely-if": "off",
+    "no-multiple-empty-lines": "off",
+    "object-curly-newline": "off"
   }
 }
