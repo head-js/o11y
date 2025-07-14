@@ -1,4 +1,4 @@
-import { datafluxRum } from '@cloudcare/browser-rum';
+import { datafluxRum } from './dataflux-rum.js';
 
 
 export default function guancecom(
@@ -91,7 +91,7 @@ export default function guancecom(
   const guancecom: any = {
     name: 'Guance.com',
     type: 'destination',
-    version: '3.1.5-1',
+    version: '3.2.24-1',
     isLoaded: (): boolean => true,
     load: (): Promise<void> => Promise.resolve(),
     track: addAction,
